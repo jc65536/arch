@@ -1,0 +1,25 @@
+#!/bin/bash
+
+ln-sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
+hwclock --systohc
+
+sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+locale-gen
+"LANG=en_US.UTF-8" >> /etc/locale.conf
+
+HOST_NAME="myhostname"
+DOMAIN="localdomain"
+$HOST_NAME >> /etc/myhostname
+printf "\
+127.0.0.1\tlocalhost\n\
+::1\t\tlocalhost\n\
+127.0.1.1\t$HOST_NAME.$DOMAIN\t$HOST_NAME" >> /etc/hosts
+
+mkinitcpio -P
+passwd
+pacman -S grub efibootmgr
+grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+
+pacman -S lxde
+
+exit

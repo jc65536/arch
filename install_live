@@ -52,8 +52,8 @@ timedatectl set-ntp true
 
 echo "Current block devices:"
 fdisk -l
-read -p "Enter the correct block device name: " blkdev
-read -p "Installing to /dev/$blkdev. Continue? (y/n): " -n 1 -r
+read -p "Enter the correct block device name (e.g. /dev/sda): " blkdev
+read -p "Installing to $blkdev. Continue? (y/n): " -n 1 -r
 echo
 if [[ ! $REPLY =~ ^[Yy]$ ]]
 then
@@ -73,7 +73,7 @@ then
     exit
 fi
 
-fdisk /dev/$blkdev << EOF
+fdisk $blkdev << EOF
 g
 n
 

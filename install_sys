@@ -1,25 +1,56 @@
 #!/bin/bash
+# Jason's Arch Linux Installation Scripts
+# Run this script once chrooted into the installed system
+
+lvm_yes=[[ -f lvm_yes ]]
+read esp < esp_var
+if [[ lvm_yes ]]
+then
+    rm lvm_yes
+fi
+rm esp_var
 
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 hwclock --systohc
 
+pacman -S vim
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
 locale-gen
-printf "LANG=en_US.UTF-8" >> /etc/locale.conf
+echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 
-HOST_NAME="myhostname"
-DOMAIN="localdomain"
-printf $HOST_NAME >> /etc/hostname
-printf "\
-127.0.0.1\tlocalhost\n\
-::1\t\tlocalhost\n\
-127.0.1.1\t$HOST_NAME.$DOMAIN\t$HOST_NAME" >> /etc/hosts
+hostname="myhostname"
+echo $host_name >> /etc/hostname
+echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$hostname" >> /etc/hosts
 
-mkinitcpio -P
-passwd
+if [[ lvm_yes ]]
+then
+    pacman -S lvm2
+    echo "Now configure mkinitcpio. Add the following hooks to the HOOKS array:"
+    echo "keyboard, keymap, encrypt, lvm2"
+    echo "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
+    read -p "Press Enter to continue to vim"
+    vim /etc/mkinitcpio.conf
+    mkinitcpio -P
+fi
+
 pacman -S grub efibootmgr
-grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=$esp --bootloader-id=GRUB
 
-pacman -S lxde
+if [[ -f lvm_yes ]]
+then
+    echo "Now configure GRUB to work with LVM on LUKS."
+    lsblk -f
+    read -p "Enter the correct device UUID for the encrypted device: " $uuid
+    echo "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
+    echo "cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
+    read -p "Press Enter to continue to vim"
+    vim /etc/default/grub
+fi
+
+pacman -S amd-ucode
+grub-mkconfig -o /boot/grub/grub.cfg
+
+echo "Now set the root password."
+passwd
 
 exit

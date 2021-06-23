@@ -1,0 +1,146 @@
+#!/bin/bash
+# Jason's Arch Linux Installation Scripts
+# Run this one inside the live environment
+
+if ls /sys/firmware/efi/efivars
+then
+    read -p "UEFI mode is on. Continue? (y/n): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        echo "Installation cancelled."
+        exit
+    fi
+else
+    echo "UEFI mode is not on. Installation cancelled."
+    exit
+fi
+
+ip link
+read -p "Is the needed network interface enabled? (y/n): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Using iwctl to connect to Wi-Fi."
+    while :
+    do
+        iwctl device list
+        read -p "Enter the correct device name: " netdev
+        echo
+        iwctl station $netdev scan
+        iwctl station $netdev get-networks
+        read -p "Enter the correct network SSID: " ssid
+        echo
+        if iwctl station $netdev connect $ssid
+        then
+            echo "Wi-fi connected. Checking ping:"
+            ping archlinux.org
+            break
+        else
+            echo "Wi-fi failed to connect. Try again."
+        fi
+    done
+else
+    echo "Enable the needed network interface. Installation cancelled."
+    exit
+fi
+
+timedatectl set-ntp true
+
+echo "Current block devices:"
+fdisk -l
+read -p "Enter the correct block device name: " blkdev
+echo
+read -p "Installing to /dev/$blkdev. Continue? (y/n): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Installation cancelled."
+    exit
+fi
+
+echo "Disk partitioning:"
+echo "Mount point   Partition               Partition type              Size"
+echo "/mnt/efi      EFI system partition    EFI System (1)              260 MiB"
+echo "/mnt          Root partition          Linux root (x86-64) (23)    Remaining"
+read -p "Is this ok? (y/n): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Installation cancelled."
+    exit
+fi
+
+fdisk /dev/$blkdev << EOF
+g
+n
+
+
++260M
+t
+1
+n
+
+
+
+t
+2
+23
+w
+EOF
+echo "Disks partitioned successfully."
+echo "Now manually enter the partition device names from the following list:"
+fdisk -l
+read -p "Which is the ESP? (e.g. /dev/sda1): " esp
+read -p "Which is the root partition? (e.g. /dev/sda2): " root
+
+read -p "Set up LVM on LUKS? (y/n): " -n 1 -r
+echo
+lvm_yes=[[ $REPLY =~ ^[Yy]$ ]]
+if [[ lvm_yes ]]
+then
+    cryptsetup luksFormat $root
+    cryptsetup open $root cryptlvm
+    pvcreate /dev/mapper/cryptlvm
+    vgcreate vg1 /dev/mapper/cryptlvm
+    lvcreate -l 100%FREE vg1 -n root
+    root="/dev/vg1/root"
+fi
+
+echo "Formatting and mounting partitions."
+mkfs.ext4 $root
+mkfs.fat -F32 $esp
+mount $root /mnt
+mkdir /mnt/efi
+mount $esp /mnt/efi
+echo "Formatting complete and mounted."
+
+read -p "Arch will now be installed. Continue? (y/n): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Installation cancelled."
+    exit
+fi
+
+pacstrap /mnt base linux linux-firmware
+genfstab -U /mnt >> /mnt/etc/fstab
+
+read -p "Installation complete. After chrooting into the new system, run install_sys. Continue? (y/n): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Too late ;)"
+fi
+
+cp install_sys /mnt
+chmod +x /mnt/install_sys
+
+if [[ lvm_yes ]]
+then
+    touch /mnt/lvm_yes
+fi
+echo $esp >> /mnt/esp_var
+
+arch-chroot /mnt
+rm /mnt/install_sys

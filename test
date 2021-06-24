@@ -1,0 +1,15 @@
+#!/bin/bash
+
+yes_no_prompt() {
+    read -p "$1" -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]]
+}
+
+inp () {
+    local -n ref=$2
+    read -p $1 ref
+}
+
+inp "hello" fdsa
+echo $fdsa

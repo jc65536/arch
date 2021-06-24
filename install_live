@@ -1,77 +1,74 @@
 #!/bin/bash
 # Jason's Arch Linux Installation Scripts
-# Run this one inside the live environment
+# Run this script inside the live environment
 
-if ls /sys/firmware/efi/efivars
-then
-    read -p "UEFI mode is on. Continue? (y/n): " -n 1 -r
+yes_no_prompt () {
+    read -p "[INSTALLER] $1" -n 1 -r
     echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]
-    then
-        echo "Installation cancelled."
-        exit
-    fi
-else
-    echo "UEFI mode is not on. Installation cancelled."
+    [[ $REPLY =~ ^[Yy]$ ]]
+}
+
+p () {
+    echo "[INSTALLER] $1"
+}
+
+inp () {
+    local -n ref=$2
+    read -p "[INSTALLER] $1" ref
+}
+
+if ! ls /sys/firmware/efi/efivars
+then
+    p "UEFI mode is not on. Installation cancelled."
     exit
 fi
 
 ip link
-read -p "Is the needed network interface enabled? (y/n): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
+if yes_no_prompt "Is the needed network interface enabled? (y/n): "
 then
-    read -p "Connect to Wi-Fi? (y/n): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]
+    if yes_no_prompt "Connect to Wi-Fi? (y/n): "
     then
-        echo "Using iwctl to connect to Wi-Fi."
+        p "Using iwctl to connect to Wi-Fi"
         while :
         do
             iwctl device list
-            read -p "Enter the correct device name: " netdev
+            inp "Enter the correct device name: " netdev
             iwctl station $netdev scan
             iwctl station $netdev get-networks
-            read -p "Enter the correct network SSID: " ssid
+            inp "Enter the correct network SSID: " ssid
             if iwctl station $netdev connect $ssid
             then
-                echo "Wi-fi connected. Checking ping:"
+                p "Wi-fi connected. Checking ping:"
                 ping archlinux.org
                 break
             else
-                echo "Wi-fi failed to connect. Try again."
+                p "Wi-fi failed to connect. Try again."
             fi
         done
     fi
 else
-    echo "Enable the needed network interface. Installation cancelled."
+    p "Enable the needed network interface. Installation cancelled."
     exit
 fi
 
 timedatectl set-ntp true
 
-echo "Current block devices:"
-fdisk -l
-read -p "Enter the correct block device name (e.g. /dev/sda): " blkdev
-read -p "Installing to $blkdev. Continue? (y/n): " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Installation cancelled."
-    exit
-fi
+while :
+do
+    p "Current block devices:"
+    fdisk -l
+    inp "Enter the correct block device name (e.g. /dev/sda): " blkdev
+    if [[ -b $blkdev ]] && yes_no_prompt "Partitioning $blkdev. Continue? (y/n): "
+    then
+        break
+    fi
+    p "Choose another block device."
+done
 
-echo "Disk partitioning:"
-echo "Mount point   Partition               Partition type              Size"
-echo "/mnt/efi      EFI system partition    EFI System (1)              260 MiB"
-echo "/mnt          Root partition          Linux root (x86-64) (23)    Remaining"
-read -p "Is this ok? (y/n): " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Installation cancelled."
-    exit
-fi
+# Disk partitioning:
+# Mount point   Partition               Partition type              Size
+# /mnt/efi      EFI system partition    EFI System (1)              260 MiB
+# /mnt          Root partition          Linux root (x86-64) (23)    Remaining
 
 fdisk $blkdev << EOF
 g
@@ -90,17 +87,25 @@ t
 23
 w
 EOF
-echo "Disks partitioned successfully."
-echo "Now manually enter the partition device names from the following list:"
-fdisk -l
-read -p "Which is the ESP? (e.g. /dev/sda1): " esp
-read -p "Which is the root partition? (e.g. /dev/sda2): " root
+p "Disks partitioned successfully"
 
-read -p "Set up LVM on LUKS? (y/n): " -n 1 -r
-echo
-lvm_yes=[[ $REPLY =~ ^[Yy]$ ]]
-if [[ lvm_yes ]]
+while :
+do
+    p "Now manually enter the partition device names from the following list:"
+    fdisk -l
+    inp "Which is the ESP? (e.g. /dev/sda1): " esp
+    inp "Which is the root partition? (e.g. /dev/sda2): " root
+    if [[ -b $esp ]] && [[ -b root ]] && yes_no_prompt "The ESP is $esp and the root partition is $root. Correct? (y/n): "
+    then
+        break
+    fi
+    p "Enter the correct partition device names."
+done
+
+lvm_yes=0
+if yes_no_prompt "Set up LVM on LUKS? (y/n)"
 then
+    lvm_yes=1
     cryptsetup luksFormat $root
     cryptsetup open $root cryptlvm
     pvcreate /dev/mapper/cryptlvm
@@ -109,40 +114,29 @@ then
     root="/dev/vg1/root"
 fi
 
-echo "Formatting and mounting partitions."
+p "Formatting and mounting partitions"
 mkfs.ext4 $root
 mkfs.fat -F32 $esp
 mount $root /mnt
 mkdir /mnt/efi
 mount $esp /mnt/efi
-echo "Formatting complete and mounted."
+p "Formatting complete and mounted"
 
-read -p "Arch will now be installed. Continue? (y/n): " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
-then
-    echo "Installation cancelled."
-    exit
-fi
-
+p "Installing Arch Linux base packages"
 pacstrap /mnt base linux linux-firmware
 genfstab -U /mnt >> /mnt/etc/fstab
 
-read -p "Installation complete. After chrooting into the new system, run install_sys. Continue? (y/n): " -n 1 -r
-echo
-if [[ ! $REPLY =~ ^[Yy]$ ]]
+if ! yes_no_prompt "Installation complete. After chrooting into the new system, run ./install_sys. Continue? (y/n): "
 then
-    echo "Too late ;)"
+    p "Too late ;)"
 fi
 
 cp install_sys /mnt
+sed -i "s/LVM_YES_PLACEHOLDER/$lvm_yes/" /mnt/install_sys
+sed -i "s/ESP_PLACEHOLDER/$esp/" /mnt/install_sys
 chmod +x /mnt/install_sys
-
-if [[ lvm_yes ]]
-then
-    touch /mnt/lvm_yes
-fi
-echo $esp >> /mnt/esp_var
 
 arch-chroot /mnt
 rm /mnt/install_sys
+
+p "Now, reboot into Arch Linux!"

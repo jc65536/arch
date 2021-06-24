@@ -2,30 +2,38 @@
 # Jason's Arch Linux Installation Scripts
 # Run this script once chrooted into the installed system
 
-lvm_yes=[[ -f lvm_yes ]]
-read esp < esp_var
-if [[ lvm_yes ]]
-then
-    rm lvm_yes
-fi
-rm esp_var
+lvm_yes=LVM_YES_PLACEHOLDER
+esp=ESP_PLACEHOLDER
+
+p () {
+    echo "[INSTALLER] $1"
+}
+
+inp () {
+    local -n ref=$2
+    read -p "[INSTALLER] $1" ref
+}
 
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 hwclock --systohc
+p "Time zone configuration complete"
 
-pacman -S vim
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
+p "Localization configuration complete"
 
 hostname="myhostname"
 echo $host_name >> /etc/hostname
 echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$hostname" >> /etc/hosts
+p "Network configuration complete. You may want to install a network manager."
 
-if [[ lvm_yes ]]
+pacman -S vim
+
+if [[ lvm_yes == 1 ]]
 then
     pacman -S lvm2
-    echo "Now configure mkinitcpio. Add the following hooks to the HOOKS array:"
+    p "Now, configure mkinitcpio. Add the following hooks to the HOOKS array:"
     echo "keyboard, keymap, encrypt, lvm2"
     echo "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
     read -p "Press Enter to continue to vim"
@@ -36,12 +44,12 @@ fi
 pacman -S grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=$esp --bootloader-id=GRUB
 
-if [[ -f lvm_yes ]]
+if [[ lvm_yes ]]
 then
-    echo "Now configure GRUB to work with LVM on LUKS."
+    p "Now configure GRUB to work with LVM on LUKS."
     lsblk -f
-    read -p "Enter the correct device UUID for the encrypted device: " $uuid
-    echo "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
+    inp "Enter the correct device UUID for the encrypted device: " uuid
+    p "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
     echo "cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
     read -p "Press Enter to continue to vim"
     vim /etc/default/grub
@@ -50,7 +58,7 @@ fi
 pacman -S amd-ucode
 grub-mkconfig -o /boot/grub/grub.cfg
 
-echo "Now set the root password."
+p "Set the root password."
 passwd
 
-exit
+p "Type exit to return to the live environment."

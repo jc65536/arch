@@ -95,7 +95,7 @@ do
     fdisk -l
     inp "Which is the ESP? (e.g. /dev/sda1): " esp
     inp "Which is the root partition? (e.g. /dev/sda2): " root
-    if [[ -b $esp ]] && [[ -b root ]] && yes_no_prompt "The ESP is $esp and the root partition is $root. Correct? (y/n): "
+    if [[ -b $esp ]] && [[ -b $root ]] && yes_no_prompt "The ESP is $esp and the root partition is $root. Correct? (y/n): "
     then
         break
     fi

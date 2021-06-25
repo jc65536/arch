@@ -5,6 +5,12 @@
 lvm_yes=LVM_YES_PLACEHOLDER
 esp=ESP_PLACEHOLDER
 
+yes_no_prompt () {
+    read -p "[INSTALLER] $1" -n 1 -r
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]]
+}
+
 p () {
     echo "[INSTALLER] $1"
 }
@@ -30,29 +36,32 @@ p "Network configuration complete. You may want to install a network manager."
 
 pacman -S vim
 
-if [[ lvm_yes == 1 ]]
+if [[ $lvm_yes == 1 ]]
 then
     pacman -S lvm2
-    p "Now, configure mkinitcpio. Add the following hooks to the HOOKS array:"
-    echo "keyboard, keymap, encrypt, lvm2"
-    echo "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
-    read -p "Press Enter to continue to vim"
+    p "Now, configure mkinitcpio. Add the following hooks to the HOOKS array: keyboard, keymap, encrypt, lvm2"
+    p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
+    inp "Press Enter to continue to vim" x
     vim /etc/mkinitcpio.conf
     mkinitcpio -P
 fi
 
 pacman -S grub efibootmgr
-grub-install --target=x86_64-efi --efi-directory=$esp --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
 
-if [[ lvm_yes ]]
+if [[ $lvm_yes == 1 ]]
 then
     p "Now configure GRUB to work with LVM on LUKS."
     lsblk -f
     inp "Enter the correct device UUID for the encrypted device: " uuid
     p "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
-    echo "cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
-    read -p "Press Enter to continue to vim"
+    params="cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
+    p $params
+    p "While in vim, type :!cat params to see the params again"
+    echo $params >> params
+    inp "Press Enter to continue to vim" x
     vim /etc/default/grub
+    rm params
 fi
 
 pacman -S amd-ucode
@@ -61,4 +70,9 @@ grub-mkconfig -o /boot/grub/grub.cfg
 p "Set the root password."
 passwd
 
-p "Type exit to return to the live environment."
+pacman -S xfce4
+
+if yes_no_prompt "Exit to the live environment? (y/n): "
+then
+    exit
+fi

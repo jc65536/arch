@@ -23,32 +23,27 @@ then
     exit
 fi
 
-ip link
-if yes_no_prompt "Is the needed network interface enabled? (y/n): "
+if yes_no_prompt "Connect to Wi-Fi? (y/n): "
 then
-    if yes_no_prompt "Connect to Wi-Fi? (y/n): "
-    then
-        p "Using iwctl to connect to Wi-Fi"
-        while :
-        do
-            iwctl device list
-            inp "Enter the correct device name: " netdev
-            iwctl station $netdev scan
-            iwctl station $netdev get-networks
-            inp "Enter the correct network SSID: " ssid
-            if iwctl station $netdev connect $ssid
-            then
-                p "Wi-fi connected. Checking ping:"
-                ping archlinux.org
-                break
-            else
-                p "Wi-fi failed to connect. Try again."
-            fi
-        done
-    fi
+    p "Using iwctl to connect to Wi-Fi"
+    while :
+    do
+        iwctl device list
+        inp "Enter the correct device name: " netdev
+        iwctl station $netdev scan
+        iwctl station $netdev get-networks
+        inp "Enter the correct network SSID: " ssid
+        if iwctl station $netdev connect $ssid
+        then
+            p "Wi-fi connected. Checking ping:"
+            ping archlinux.org
+            break
+        else
+            p "Wi-fi failed to connect. Try again."
+        fi
+    done
 else
-    p "Enable the needed network interface. Installation cancelled."
-    exit
+    inp "If using ethernet, connect the cable and press Enter." x
 fi
 
 timedatectl set-ntp true
@@ -107,11 +102,13 @@ if yes_no_prompt "Set up LVM on LUKS? (y/n)"
 then
     lvm_yes=1
     cryptsetup luksFormat $root
+    p "Enter your password again to open the encrypted device."
     cryptsetup open $root cryptlvm
     pvcreate /dev/mapper/cryptlvm
     vgcreate vg1 /dev/mapper/cryptlvm
     lvcreate -l 100%FREE vg1 -n root
     root="/dev/vg1/root"
+    p "LVM on LUKS setup complete"
 fi
 
 p "Formatting and mounting partitions"
@@ -133,10 +130,13 @@ fi
 
 cp install_sys /mnt
 sed -i "s/LVM_YES_PLACEHOLDER/$lvm_yes/" /mnt/install_sys
-sed -i "s/ESP_PLACEHOLDER/$esp/" /mnt/install_sys
+sed -i "s/ESP_PLACEHOLDER/${esp//\//\\/}/" /mnt/install_sys
 chmod +x /mnt/install_sys
 
 arch-chroot /mnt
 rm /mnt/install_sys
 
-p "Now, reboot into Arch Linux!"
+if yes_no_prompt "Reboot? (y/n): "
+then
+    reboot
+fi

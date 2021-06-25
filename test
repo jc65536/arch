@@ -1,15 +1,20 @@
 #!/bin/bash
 
-yes_no_prompt() {
-    read -p "$1" -n 1 -r
+yes_no_prompt () {
+    read -p "[INSTALLER] $1" -n 1 -r
     echo
     [[ $REPLY =~ ^[Yy]$ ]]
 }
 
-inp () {
-    local -n ref=$2
-    read -p $1 ref
+p () {
+    echo "[INSTALLER] $1"
 }
 
-inp "hello" fdsa
-echo $fdsa
+inp () {
+    local -n ref=$2
+    read -p "[INSTALLER] $1" ref
+}
+
+p "\nNow, configure mkinitcpio. Add the following hooks to the HOOKS array: keyboard, keymap, encrypt, lvm2"
+    p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
+    inp "Press Enter to continue to vim" x

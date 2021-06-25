@@ -65,13 +65,15 @@ then
 fi
 
 pacman -S amd-ucode
-grub-mkconfig -o /boot/grub/grub.cfg
+#grub-mkconfig -o /boot/grub/grub.cfg
+echo "grub-mkconfig -o /boot/grub/grub.cfg"
+exit
 
 p "Set the root password."
 passwd
 
 # Additional packages
 # For VirtualBox
-pacman -S vbox-guest-utils
+pacman -S virtualbox-guest-utils
 
 p "Type exit to return to the live environment."

@@ -70,6 +70,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 p "Set the root password."
 passwd
 
-pacman -S xfce4
+# Additional packages
+# For VirtualBox
+pacman -S vbox-guest-utils
 
 p "Type exit to return to the live environment."

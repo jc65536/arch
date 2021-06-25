@@ -60,7 +60,7 @@ do
     p "Choose another block device."
 done
 
-# Disk partitioning:
+# Partition layout
 # Mount point   Partition               Partition type              Size
 # /mnt/efi      EFI system partition    EFI System (1)              260 MiB
 # /mnt          Root partition          Linux root (x86-64) (23)    Remaining
@@ -136,7 +136,4 @@ chmod +x /mnt/install_sys
 arch-chroot /mnt
 rm /mnt/install_sys
 
-if yes_no_prompt "Reboot? (y/n): "
-then
-    reboot
-fi
+p "Type reboot to reboot into Arch Linux!"

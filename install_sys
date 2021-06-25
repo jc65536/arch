@@ -72,7 +72,4 @@ passwd
 
 pacman -S xfce4
 
-if yes_no_prompt "Exit to the live environment? (y/n): "
-then
-    exit
-fi
+p "Type exit to return to the live environment."

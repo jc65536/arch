@@ -47,7 +47,7 @@ then
 fi
 
 pacman -S grub efibootmgr
-grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 
 if [[ $lvm_yes == 1 ]]
 then

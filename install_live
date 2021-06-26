@@ -102,8 +102,14 @@ if yes_no_prompt "Set up LVM on LUKS? (y/n)"
 then
     lvm_yes=1
     cryptsetup luksFormat $root
-    p "Enter your password again to open the encrypted device."
-    cryptsetup open $root cryptlvm
+    while :
+    do
+        p "Enter your password again to open the encrypted device."
+        if cryptsetup open $root cryptlvm
+        then
+            break
+        fi
+    done
     pvcreate /dev/mapper/cryptlvm
     vgcreate vg1 /dev/mapper/cryptlvm
     lvcreate -l 100%FREE vg1 -n root
@@ -115,8 +121,7 @@ p "Formatting and mounting partitions"
 mkfs.ext4 $root
 mkfs.fat -F32 $esp
 mount $root /mnt
-mkdir /mnt/efi
-mount $esp /mnt/efi
+mount $esp /mnt/boot
 p "Formatting complete and mounted"
 
 p "Installing Arch Linux base packages"

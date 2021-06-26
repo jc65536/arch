@@ -20,6 +20,17 @@ inp () {
     read -p "[INSTALLER] $1" ref
 }
 
+file_check () {
+    p "Double check the contents of $1:"
+    if [[ -z $2 ]]
+    then
+        cat $1 | grep $2
+    else
+        cat $1
+    fi
+    yes_no_prompt "Does that look correct? (y/n): "
+}
+
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime
 hwclock --systohc
 p "Time zone configuration complete"
@@ -32,17 +43,24 @@ p "Localization configuration complete"
 hostname="myhostname"
 echo $host_name >> /etc/hostname
 echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$hostname" >> /etc/hosts
-p "Network configuration complete. You may want to install a network manager."
+p "Network configuration complete. You might want to install a network manager."
 
 pacman -S vim
 
 if [[ $lvm_yes == 1 ]]
 then
     pacman -S lvm2
-    p "Now, configure mkinitcpio. Add the following hooks to the HOOKS array: keyboard, keymap, encrypt, lvm2"
-    p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
-    inp "Press Enter to continue to vim" x
-    vim /etc/mkinitcpio.conf
+    while :
+    do
+        p "Now, configure mkinitcpio. Add the following hooks to the HOOKS array: keyboard, keymap, encrypt, lvm2"
+        p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
+        inp "Press Enter to continue to vim" x
+        vim /etc/mkinitcpio.conf
+        if file_check "/etc/mkinitcpio.conf" "HOOKS"
+        then
+            break
+        fi
+    done
     mkinitcpio -P
 fi
 
@@ -51,23 +69,28 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 
 if [[ $lvm_yes == 1 ]]
 then
-    p "Now configure GRUB to work with LVM on LUKS."
-    lsblk -f
-    inp "Enter the correct device UUID for the encrypted device: " uuid
-    p "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
-    params="cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
-    p $params
-    p "While in vim, type :!cat params to see the params again"
-    echo $params >> params
-    inp "Press Enter to continue to vim" x
-    vim /etc/default/grub
-    rm params
+    while :
+    do
+        p "Now, configure GRUB to work with LVM on LUKS."
+        lsblk -f
+        inp "Enter the correct device UUID for the encrypted device: " uuid
+        p "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
+        params="cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
+        p $params
+        p "While in vim, type :!cat params to see the params again"
+        echo $params >> params
+        inp "Press Enter to continue to vim" x
+        vim /etc/default/grub
+        rm params
+        if file_check "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT"
+        then
+            break
+        fi
+    done
 fi
 
 pacman -S amd-ucode
-#grub-mkconfig -o /boot/grub/grub.cfg
-echo "grub-mkconfig -o /boot/grub/grub.cfg"
-exit
+grub-mkconfig -o /boot/grub/grub.cfg
 
 p "Set the root password."
 passwd

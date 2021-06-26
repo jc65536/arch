@@ -62,7 +62,7 @@ done
 
 # Partition layout
 # Mount point   Partition               Partition type              Size
-# /mnt/efi      EFI system partition    EFI System (1)              260 MiB
+# /mnt/boot     EFI system partition    EFI System (1)              260 MiB
 # /mnt          Root partition          Linux root (x86-64) (23)    Remaining
 
 fdisk $blkdev << EOF

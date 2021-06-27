@@ -97,6 +97,6 @@ passwd
 
 # Additional packages
 # For VirtualBox
-pacman -S virtualbox-guest-utils
+# pacman -S virtualbox-guest-utils
 
 p "Type exit to return to the live environment."

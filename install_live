@@ -121,6 +121,7 @@ p "Formatting and mounting partitions"
 mkfs.ext4 $root
 mkfs.fat -F32 $esp
 mount $root /mnt
+mkdir /mnt/boot
 mount $esp /mnt/boot
 p "Formatting complete and mounted"
 

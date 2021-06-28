@@ -22,7 +22,7 @@ inp () {
 
 file_check () {
     p "Double check the contents of $1:"
-    if [[ -z $2 ]]
+    if [[ ! -z $2 ]]
     then
         cat $1 | grep $2
     else
@@ -56,7 +56,7 @@ then
         p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
         inp "Press Enter to continue to vim" x
         vim /etc/mkinitcpio.conf
-        if file_check "/etc/mkinitcpio.conf" "HOOKS"
+        if file_check /etc/mkinitcpio.conf "HOOKS"
         then
             break
         fi
@@ -82,7 +82,7 @@ then
         inp "Press Enter to continue to vim" x
         vim /etc/default/grub
         rm params
-        if file_check "/etc/default/grub" "GRUB_CMDLINE_LINUX_DEFAULT"
+        if file_check /etc/default/grub "GRUB_CMDLINE_LINUX_DEFAULT"
         then
             break
         fi

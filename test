@@ -15,6 +15,15 @@ inp () {
     read -p "[INSTALLER] $1" ref
 }
 
-p "\nNow, configure mkinitcpio. Add the following hooks to the HOOKS array: keyboard, keymap, encrypt, lvm2"
-    p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
-    inp "Press Enter to continue to vim" x
+file_check () {
+    p "Double check the contents of $1:"
+    if [[ ! -z $2 ]]
+    then
+        cat $1 | grep $2
+    else
+        cat $1
+    fi
+    yes_no_prompt "Does that look correct? (y/n): "
+}
+
+file_check txt fdsa

@@ -26,4 +26,4 @@ file_check () {
     yes_no_prompt "Does that look correct? (y/n): "
 }
 
-file_check txt fdsa
+inp "fdsa"

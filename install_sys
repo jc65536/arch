@@ -56,6 +56,7 @@ then
         p "Example: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
         inp "Press Enter to continue to vim" x
         vim /etc/mkinitcpio.conf
+        p "Example again: HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt lvm2 filesystems fsck)"
         if file_check /etc/mkinitcpio.conf "HOOKS"
         then
             break
@@ -77,11 +78,12 @@ then
         p "Now edit GRUB_CMDLINE_LINUX_DEFAULT to include the following parameters:"
         params="cryptdevice=UUID=$uuid:cryptlvm root=/dev/vg1/root"
         p $params
-        p "While in vim, type :!cat params to see the params again"
+        p "While in vim, type \`:read !cat params\` to paste the parameters."
         echo $params >> params
         inp "Press Enter to continue to vim" x
         vim /etc/default/grub
         rm params
+        p "Parameters again: $params"
         if file_check /etc/default/grub "GRUB_CMDLINE_LINUX_DEFAULT"
         then
             break
@@ -95,8 +97,18 @@ grub-mkconfig -o /boot/grub/grub.cfg
 p "Set the root password."
 passwd
 
+
+# Post Installation
+
+uname="jason"
+useradd -m $uname
+p "Enter password for user $uname."
+passwd $uname
+
 # Additional packages
 # For VirtualBox
 # pacman -S virtualbox-guest-utils
+pacman -S networkmanager xorg-server awesome
+systemctl enable NetworkManager.service
 
 p "Type exit to return to the live environment."

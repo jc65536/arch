@@ -106,9 +106,16 @@ p "Enter password for user $uname."
 passwd $uname
 
 # Additional packages
+
 # For VirtualBox
-# pacman -S virtualbox-guest-utils
-pacman -S networkmanager xorg-server awesome
+pacman -S virtualbox-guest-utils
+
+# KDE
+pacman -S plasma-meta dolphin konsole kwrite
+
+# Other
+pacman -S firefox
+
 systemctl enable NetworkManager.service
 
 p "Type exit to return to the live environment."

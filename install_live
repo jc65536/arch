@@ -101,7 +101,14 @@ lvm_yes=0
 if yes_no_prompt "Set up LVM on LUKS? (y/n)"
 then
     lvm_yes=1
-    cryptsetup luksFormat $root
+    while :
+    do
+        p "Set a password for the encrypted device."
+        if cryptsetup luksFormat $root
+        then
+            break
+        fi
+    done
     while :
     do
         p "Enter your password again to open the encrypted device."

@@ -2,8 +2,8 @@
 # Jason's Arch Linux Installation Scripts
 # Run this script once chrooted into the installed system
 
-lvm_yes=LVM_YES_PLACEHOLDER
-esp=ESP_PLACEHOLDER
+lvm_yes=<LVM_YES_PLACEHOLDER>
+esp=<ESP_PLACEHOLDER>
 
 yes_no_prompt () {
     read -p "[INSTALLER] $1" -n 1 -r
@@ -97,25 +97,28 @@ grub-mkconfig -o /boot/grub/grub.cfg
 p "Set the root password."
 passwd
 
-
 # Post Installation
 
+# Users
 uname="jason"
-useradd -m $uname
-p "Enter password for user $uname."
+useradd -m -G wheel $uname
+p "Set the password for user $uname."
 passwd $uname
 
-# Additional packages
+pacman -S sudo
+while :
+do
+    p "In the sudoers file, uncomment the line for the wheel group."
+    inp "Press Enter to continue to visudo" x
+    visudo
+    if file_check /etc/sudoers "wheel"
+    then
+        break
+    fi
+done
 
-# For VirtualBox
-pacman -S virtualbox-guest-utils
-
-# KDE
-pacman -S plasma-meta dolphin konsole kwrite
-
-# Other
-pacman -S firefox
-
+# Desktop applications
+pacman -S networkmanager
 systemctl enable NetworkManager.service
 
 p "Type exit to return to the live environment."

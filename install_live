@@ -77,9 +77,6 @@ n
 
 
 
-t
-2
-23
 w
 EOF
 p "Disks partitioned successfully"
@@ -120,6 +117,7 @@ then
     pvcreate /dev/mapper/cryptlvm
     vgcreate vg1 /dev/mapper/cryptlvm
     lvcreate -l 100%FREE vg1 -n root
+    lvresize -L -4G vg1/root            # Subtract 4 GiB for snapshots
     root="/dev/vg1/root"
     p "LVM on LUKS setup complete"
 fi
@@ -142,8 +140,8 @@ then
 fi
 
 cp install_sys /mnt
-sed -i "s/LVM_YES_PLACEHOLDER/$lvm_yes/" /mnt/install_sys
-sed -i "s/ESP_PLACEHOLDER/${esp//\//\\/}/" /mnt/install_sys
+sed -i "s/<LVM_YES_PLACEHOLDER>/$lvm_yes/" /mnt/install_sys
+sed -i "s/<ESP_PLACEHOLDER>/${esp//\//\\/}/" /mnt/install_sys
 chmod +x /mnt/install_sys
 
 arch-chroot /mnt

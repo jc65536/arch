@@ -40,7 +40,7 @@ locale-gen
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 p "Localization configuration complete"
 
-hostname="myhostname"
+hostname="tiramisu"
 echo $host_name >> /etc/hostname
 echo -e "127.0.0.1\tlocalhost\n::1\t\tlocalhost\n127.0.1.1\t$hostname" >> /etc/hosts
 p "Network configuration complete. You might want to install a network manager."

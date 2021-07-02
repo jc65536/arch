@@ -6,7 +6,7 @@ lvm_yes=<LVM_YES_PLACEHOLDER>
 esp=<ESP_PLACEHOLDER>
 
 yes_no_prompt () {
-    read -p "[INSTALLER] $1" -n 1 -r
+    read -p "[INSTALLER] $1 (y/n): " -n 1 -r
     echo
     [[ $REPLY =~ ^[Yy]$ ]]
 }
@@ -28,7 +28,7 @@ file_check () {
     else
         cat $1
     fi
-    yes_no_prompt "Does that look correct? (y/n): "
+    yes_no_prompt "Does that look correct?"
 }
 
 ln -sf /usr/share/zoneinfo/America/Los_Angeles /etc/localtime

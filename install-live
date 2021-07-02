@@ -1,9 +1,9 @@
 #!/bin/bash
 # Jason's Arch Linux Installation Scripts
-# Run this script inside the live environment
+# Run this script from the live environment
 
 yes_no_prompt () {
-    read -p "[INSTALLER] $1" -n 1 -r
+    read -p "[INSTALLER] $1 (y/n): " -n 1 -r
     echo
     [[ $REPLY =~ ^[Yy]$ ]]
 }
@@ -23,7 +23,29 @@ then
     exit
 fi
 
-if yes_no_prompt "Connect to Wi-Fi? (y/n): "
+# Realtek driver
+drivers_installed=0
+linux_headers_pkg=../drivers/linux-headers/*
+dkms_pkg=../drivers/dkms/*
+realtek_pkg=../drivers/realtek/*
+if [[ $drivers_installed == 0 ]]
+then
+    pacman -U $linux_headers_pkg $dkms_pkg
+    pacman -U $realtek_pkg
+    modprobe rtw89pci
+    sed -i "s/drivers_installed=0/drivers_installed=1/" ./install-live
+fi
+
+while :
+do
+    lspci -k | less
+    if yes_no_prompt "Are the drivers working?"
+    then
+        break
+    fi
+done
+
+if yes_no_prompt "Connect to Wi-Fi?"
 then
     p "Using iwctl to connect to Wi-Fi"
     while :
@@ -53,7 +75,7 @@ do
     p "Current block devices:"
     fdisk -l
     inp "Enter the correct block device name (e.g. /dev/sda): " blkdev
-    if [[ -b $blkdev ]] && yes_no_prompt "Partitioning $blkdev. Continue? (y/n): "
+    if [[ -b $blkdev ]] && yes_no_prompt "Partitioning $blkdev. Continue?"
     then
         break
     fi
@@ -87,7 +109,7 @@ do
     fdisk -l
     inp "Which is the ESP? (e.g. /dev/sda1): " esp
     inp "Which is the root partition? (e.g. /dev/sda2): " root
-    if [[ -b $esp ]] && [[ -b $root ]] && yes_no_prompt "The ESP is $esp and the root partition is $root. Correct? (y/n): "
+    if [[ -b $esp ]] && [[ -b $root ]] && yes_no_prompt "The ESP is $esp and the root partition is $root. Correct?"
     then
         break
     fi
@@ -134,17 +156,17 @@ p "Installing Arch Linux base packages"
 pacstrap /mnt base linux linux-firmware
 genfstab -U /mnt >> /mnt/etc/fstab
 
-if ! yes_no_prompt "Installation complete. After chrooting into the new system, run ./install_sys. Continue? (y/n): "
+if ! yes_no_prompt "Installation complete. After chrooting into the new system, run ./install-sys. Continue?"
 then
     p "Too late ;)"
 fi
 
-cp install_sys /mnt
-sed -i "s/<LVM_YES_PLACEHOLDER>/$lvm_yes/" /mnt/install_sys
-sed -i "s/<ESP_PLACEHOLDER>/${esp//\//\\/}/" /mnt/install_sys
-chmod +x /mnt/install_sys
+cp ./install-sys /mnt
+sed -i "s/<LVM_YES_PLACEHOLDER>/$lvm_yes/" /mnt/install-sys
+sed -i "s/<ESP_PLACEHOLDER>/${esp//\//\\/}/" /mnt/install-sys
+chmod +x /mnt/install-sys
 
 arch-chroot /mnt
-rm /mnt/install_sys
+rm /mnt/install-sys
 
 p "Type reboot to reboot into Arch Linux!"

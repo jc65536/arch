@@ -23,28 +23,6 @@ then
     exit
 fi
 
-# Realtek driver
-drivers_installed=0
-linux_headers_pkg=../drivers/linux-headers/*
-dkms_pkg=../drivers/dkms/*
-realtek_pkg=../drivers/realtek/*
-if [[ $drivers_installed == 0 ]]
-then
-    pacman -U $linux_headers_pkg $dkms_pkg
-    pacman -U $realtek_pkg
-    modprobe rtw89pci
-    sed -i "s/drivers_installed=0/drivers_installed=1/" ./install-live
-fi
-
-while :
-do
-    lspci -k | less
-    if yes_no_prompt "Are the drivers working?"
-    then
-        break
-    fi
-done
-
 if yes_no_prompt "Connect to Wi-Fi?"
 then
     p "Using iwctl to connect to Wi-Fi"
@@ -84,7 +62,7 @@ done
 
 # Partition layout
 # Mount point   Partition               Partition type              Size
-# /mnt/boot     EFI system partition    EFI System                  260 MiB
+# /mnt/boot     EFI system partition    EFI System                  512 MiB
 # /mnt          Root partition          Linux filesystem            Remaining
 
 fdisk $blkdev << EOF
@@ -92,7 +70,7 @@ g
 n
 
 
-+260M
++512M
 t
 1
 n

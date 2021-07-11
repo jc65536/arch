@@ -117,9 +117,8 @@ do
     fi
 done
 
-# Desktop applications
-pacman -S gnome firefox networkmanager
+# Internet
+pacman -S networkmanager
 systemctl enable NetworkManager.service
-systemctl enable gdm.service
 
 p "Type exit to return to the live environment."

@@ -6,3 +6,6 @@ install -Dm755 /usr/share/doc/bspwm/examples/bspwmrc ~/.config/bspwm/bspwmrc
 install -Dm644 /usr/share/doc/bspwm/examples/sxhkdrc ~/.config/sxhkd/sxhkdrc
 
 sed -i "s/urxvt/alacritty/" ~/.config/sxhkd/sxhkdrc
+
+systemctl enable lightdm.service
+echo "Disable any other display managers (e.g. gdm)"

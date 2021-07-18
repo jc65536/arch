@@ -10,5 +10,3 @@
 # xorg-xsetroot - cursor settings
 
 sudo pacman -S xorg-server bspwm sxhkd alacritty xsecurelock rofi picom nitrogen xorg-xsetroot #lightdm lightdm-gtk-greeter
-
-sed -i "s/urxvt/alacritty/" ~/.config/sxhkd/sxhkdrc

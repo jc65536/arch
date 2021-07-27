@@ -1,8 +1,10 @@
-rm -rf alacritty bspwm picom polybar rofi sxhkd pulse/default.pa
+#!/bin/bash
+rm -rf alacritty bspwm picom polybar rofi sxhkd dunst pulse/default.pa
 cp -r ~/.config/alacritty .
 cp -r ~/.config/bspwm .
 cp -r ~/.config/picom .
 cp -r ~/.config/polybar .
 cp -r ~/.config/rofi .
 cp -r ~/.config/sxhkd .
+cp -r ~/.config/dunst .
 cp ~/.config/pulse/default.pa pulse/

@@ -2,9 +2,13 @@
 # wm independent hotkeys
 #
 
+# test
+alt + d
+	killall rofi
+
 # program launcher
 super + Return
-	rofi -show run
+	rofi -show drun
 
 # program switcher
 super + Tab

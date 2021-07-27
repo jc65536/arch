@@ -8,5 +8,8 @@
 # picom         - compositor
 # nitrogen      - wallpaper
 # xorg-xsetroot - cursor settings
+# lxappearance  - gtk theme
+# xorg-xrandr   - xorg stuff
+# dunst         - notifications
 
-sudo pacman -S xorg-server bspwm sxhkd alacritty xsecurelock rofi picom nitrogen xorg-xsetroot #lightdm lightdm-gtk-greeter
+sudo pacman -S xorg-server bspwm sxhkd alacritty xsecurelock rofi picom nitrogen xorg-xsetroot lxappearance xorg-xrandr dunst #lightdm lightdm-gtk-greeter

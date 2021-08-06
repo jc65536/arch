@@ -65,6 +65,7 @@ done
 # /mnt/boot     EFI system partition    EFI System                  512 MiB
 # /mnt          Root partition          Linux filesystem            Remaining
 
+wipefs --all $blkdev
 fdisk $blkdev << EOF
 g
 n

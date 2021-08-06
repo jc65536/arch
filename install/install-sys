@@ -36,6 +36,8 @@ hwclock --systohc
 p "Time zone configuration complete"
 
 sed -i "s/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+sed -i "s/#zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/" /etc/locale.gen
+sed -i "s/#ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/" /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" >> /etc/locale.conf
 p "Localization configuration complete"
@@ -118,8 +120,12 @@ do
 done
 
 # Internet
-pacman -S plasma dolphin konsole firefox
+pacman -S gnome networkmanager firefox ibus-libpinyin ibus-anthy discord thunderbird jdk-openjdk python git base-devel vlc libreoffice-fresh tlp cups nftables
 systemctl enable NetworkManager.service
-systemctl enable sddm.service
+systemctl enable gdm.service
+systemctl enable tlp.service
+systemctl enable fstrim.timer
+systemctl enable cups.service
+systemctl enable nftables.service
 
 p "Type exit to return to the live environment."

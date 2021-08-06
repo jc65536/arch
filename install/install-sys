@@ -118,8 +118,8 @@ do
 done
 
 # Internet
-pacman -S gnome firefox networkmanager
+pacman -S plasma dolphin konsole firefox
 systemctl enable NetworkManager.service
-systemctl enable gdm.service
+systemctl enable sddm.service
 
 p "Type exit to return to the live environment."

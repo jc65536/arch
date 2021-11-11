@@ -120,12 +120,8 @@ do
 done
 
 # Internet
-pacman -S gnome networkmanager firefox ibus-libpinyin ibus-anthy discord thunderbird jdk-openjdk python git base-devel vlc libreoffice-fresh tlp cups nftables
+pacman -S gnome networkmanager firefox
 systemctl enable NetworkManager.service
 systemctl enable gdm.service
-systemctl enable tlp.service
-systemctl enable fstrim.timer
-systemctl enable cups.service
-systemctl enable nftables.service
 
 p "Type exit to return to the live environment."

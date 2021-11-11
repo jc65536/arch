@@ -116,8 +116,7 @@ then
     done
     pvcreate /dev/mapper/cryptlvm
     vgcreate vg1 /dev/mapper/cryptlvm
-    lvcreate -l 100%FREE vg1 -n root
-    lvresize -L -4G vg1/root            # Subtract 4 GiB for snapshots
+    lvcreate -L 234G vg1 -n root
     root="/dev/vg1/root"
     p "LVM on LUKS setup complete"
 fi

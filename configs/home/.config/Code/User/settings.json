@@ -1,0 +1,45 @@
+{
+    "files.insertFinalNewline": true,
+    "files.associations": {
+        "**/*.html": "html",
+        "**/templates/**/*.html": "django-html",
+        "**/templates/**/*": "django-txt",
+        "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+    },
+    "emmet.includeLanguages": {
+        "django-html": "html"
+    },
+    "window.restoreWindows": "none",
+    "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: LLVM, UseTab: Never, IndentWidth: 4, TabWidth: 4, BreakBeforeBraces: Attach, AllowShortIfStatementsOnASingleLine: true, IndentCaseLabels: false, ColumnLimit: 0, AccessModifierOffset: -4, NamespaceIndentation: All, FixNamespaceComments: false, SpaceAfterCStyleCast: true }",
+    "diffEditor.ignoreTrimWhitespace": false,
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    },
+    "python.formatting.provider": "autopep8",
+    "python.formatting.autopep8Path": "/usr/bin/autopep8",
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "[html]": {
+        "editor.tabSize": 2
+    },
+    "[css]": {
+        "editor.defaultFormatter": "aeschli.vscode-css-formatter"
+    },
+    "[latex]": {
+        "editor.tabSize": 2
+    },
+    "rust-client.rustupPath": "~/.cargo/bin/rustup",
+    "rust-client.disableRustup": true,
+    "editor.bracketPairColorization.enabled": false,
+    "vim.textwidth": 79,
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "haskell.manageHLS": "GHCup",
+    "vim.vimrc.enable": true,
+    "editor.inlayHints.enabled": "off",
+    "latex-workshop.latex.recipe.default": "lastUsed",
+    "vim.joinspaces": false
+}

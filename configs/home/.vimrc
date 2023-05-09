@@ -1,1 +1,11 @@
-set tabstop=8 softtabstop=4 shiftwidth=4 expandtab
+set expandtab
+set shiftwidth=4
+set softtabstop=4
+set textwidth=79
+set formatoptions+=n
+set nojoinspaces
+set showcmd
+set autoindent
+set ignorecase
+set smartcase
+syntax on

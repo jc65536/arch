@@ -3,3 +3,7 @@
 	name = Jason Cheng
 [core]
 	editor = vim
+[push]
+	autoSetupRemote = true
+[init]
+	defaultBranch = main

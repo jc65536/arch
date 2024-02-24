@@ -18,8 +18,6 @@
         "**/.settings": true,
         "**/.factorypath": true
     },
-    "python.formatting.provider": "autopep8",
-    "python.formatting.autopep8Path": "/usr/bin/autopep8",
     "javascript.updateImportsOnFileMove.enabled": "always",
     "[html]": {
         "editor.tabSize": 2
@@ -30,16 +28,20 @@
     "[latex]": {
         "editor.tabSize": 2
     },
-    "rust-client.rustupPath": "~/.cargo/bin/rustup",
-    "rust-client.disableRustup": true,
     "editor.bracketPairColorization.enabled": false,
-    "vim.textwidth": 79,
     "[python]": {
         "editor.formatOnType": true
     },
     "haskell.manageHLS": "GHCup",
     "vim.vimrc.enable": true,
-    "editor.inlayHints.enabled": "off",
-    "latex-workshop.latex.recipe.default": "lastUsed",
-    "vim.joinspaces": false
+    "latex-workshop.latex.recipe.default": "latexmk (lualatex)",
+    "vim.joinspaces": false,
+    "latex-workshop.message.error.show": false,
+    "latex-workshop.message.warning.show": false,
+    "githubPullRequests.pullBranch": "never",
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    "[svelte]": {
+        "editor.tabSize": 2
+    },
+    "svelte.enable-ts-plugin": true
 }

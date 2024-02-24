@@ -5,6 +5,8 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
+[[ -f ~/.bash_profile ]] && . ~/.bash_profile
+
 alias ls='ls --color=auto'
 alias la='ls -a'
 alias ll='ls -al'
@@ -23,4 +25,16 @@ shopt -s histverify
 
 . "$HOME/.cargo/env"
 
-[ -f "/home/jason/.ghcup/env" ] && source "/home/jason/.ghcup/env" # ghcup-env
+shell_time=$(date "+%s")
+
+if [ -f /tmp/last-shell-time ]; then
+    last_shell_time=$(cat /tmp/last-shell-time)
+else
+    last_shell_time=0
+fi
+
+if [[ $shell_time -gt $((last_shell_time + 1200)) ]]; then
+    random-quote
+fi
+
+echo $shell_time > /tmp/last-shell-time

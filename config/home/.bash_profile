@@ -3,6 +3,7 @@
 #
 
 [[ -f ~/.profile ]] && . ~/.profile
+
 . "$HOME/.cargo/env"
 
 # opam configuration

@@ -7,12 +7,13 @@
 
 [[ -f ~/.bash_profile ]] && . ~/.bash_profile
 
+. bashlib
+
 alias ls='ls --color=auto'
 alias la='ls -a'
 alias ll='ls -al'
 alias cp='cp -i'
 alias mv='mv -i'
-alias rm='rm -I'
 
 alias dl-music='yt-dlp --cookies-from-browser firefox -x --audio-quality 0'
 alias ged='gnome-text-editor'
@@ -38,3 +39,5 @@ if [[ $shell_time -gt $((last_shell_time + 1200)) ]]; then
 fi
 
 echo $shell_time > /tmp/last-shell-time
+
+[ -f "/home/jason/.ghcup/env" ] && source "/home/jason/.ghcup/env" # ghcup-env

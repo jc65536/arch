@@ -14,6 +14,7 @@ alias la='ls -a'
 alias ll='ls -al'
 alias cp='cp -i'
 alias mv='mv -i'
+alias vim='nvim'
 
 alias dl-music='yt-dlp --cookies-from-browser firefox -x --audio-quality 0'
 alias ged='gnome-text-editor'

@@ -2,7 +2,7 @@
 	email = jasoncheng224@gmail.com
 	name = Jason Cheng
 [core]
-	editor = vim
+	editor = nvim
 [push]
 	autoSetupRemote = true
 [init]

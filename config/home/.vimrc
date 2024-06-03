@@ -2,7 +2,7 @@ set expandtab
 set shiftwidth=4
 set softtabstop=4
 set textwidth=80
-set formatoptions=nq
+set formatoptions=ro/qnj
 set nojoinspaces
 set showcmd
 set autoindent

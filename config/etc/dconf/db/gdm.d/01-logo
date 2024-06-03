@@ -1,0 +1,5 @@
+# Remove greeter logo
+# https://help.gnome.org/admin/system-admin-guide/stable/login-logo.html.en
+
+[org/gnome/login-screen]
+logo=''
